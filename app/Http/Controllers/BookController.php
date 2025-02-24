@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Book;
 
 class BookController extends Controller
 {
@@ -11,7 +12,13 @@ class BookController extends Controller
      */
     public function index()
     {
-        //
+        $books = Book::all();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Books retrieved successfully.',
+            'data' => $books
+        ], 200);
     }
 
     /**
@@ -19,7 +26,22 @@ class BookController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'title' => 'required|string',
+            'writer' => 'required|string',
+            'user_id' => 'required|integer',
+            'category_id' => 'required|integer',
+            'publisher' => 'required|string',
+            'year' => 'required|integer'
+        ]);
+
+        $book = Book::create($request->all());
+
+        return response()->json([
+            'status' => 201,
+            'message' => 'Book created successfully.',
+            'data' => $book
+        ], 201);
     }
 
     /**
@@ -27,7 +49,20 @@ class BookController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $book = Book::find($id);
+
+        if (!$book) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Book not found.',
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Book retrieved successfully.',
+            'data' => $book
+        ], 200);
     }
 
     /**
@@ -35,7 +70,31 @@ class BookController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'title' => 'required|string',
+            'writer' => 'required|string',
+            'user_id' => 'required|integer',
+            'category_id' => 'required|integer',
+            'publisher' => 'required|string',
+            'year' => 'required|integer'
+        ]);
+
+        $book = Book::find($id);
+
+        if (!$book) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Book not found.',
+            ], 404);
+        }
+
+        $book->update($request->all());
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Book updated successfully.',
+            'data' => $book
+        ], 200);
     }
 
     /**
@@ -43,6 +102,20 @@ class BookController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $book = Book::find($id);
+
+        if (!$book) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Book not found.',
+            ], 404);
+        }
+
+        $book->delete();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Book deleted successfully.',
+        ], 200);
     }
 }
